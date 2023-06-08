@@ -3,6 +3,7 @@ from torchvision.transforms import Normalize
 import torch.nn.functional as F
 import torch
 from torchvision.models import resnet50, ResNet50_Weights
+from utils import count_num_layers
 
 
 MEAN = [0.485, 0.456, 0.406]  # MODIFY THIS LINE
@@ -10,32 +11,13 @@ STD = [0.229, 0.224, 0.225]  # MODIFY THIS LINE
 NEED_NORMALIZE = True  # MODIFY THIS LINE
 NUM_CLASSES = 1000  # MODIFY THIS LINE
 INPUT_SIZE = (224, 224)  # MODIFY THIS LINE
-
-
-# class SampleModel(nn.Module):
-#     def __init__(self, n_classes=10):
-#         super().__init__()
-#         self.conv1 = nn.Conv2d(3, 16, 3, padding=1)
-#         self.relu1 = nn.ReLU()
-#         self.conv2 = nn.Conv2d(16, 32, 3, padding=1)
-#         self.relu2 = nn.ReLU()
-#         self.pool = nn.MaxPool2d(2, 2)
-#         self.classifier = nn.Sequential(
-#             nn.Linear(32 * 8 * 8, 128),
-#             nn.ReLU(),
-#             nn.Linear(128, n_classes)
-#         )
-
-#     def forward(self, x):
-#         x = self.normalize(x)
-#         x = self.relu1(self.conv1(x))
-#         x = self.pool(x)
-#         x = self.relu2(self.conv2(x))
-#         x = self.pool(x)
-#         x = x.view(-1, 32 * 8 * 8)
-#         x = self.classifier(x)
-#         return x
-
+TYPE = 'Image Classification'  # MODIFY THIS LINE, options: 'Image Classification', 'Object Detection', 'Text Classification'
+# single_branch_model = [
+#     'mlp_7_linear',
+#     'lenet',
+#     'alexnet',
+#     'vgg',
+# ]
 
 class ComposedModel(nn.Module):
     def __init__(self):
@@ -53,6 +35,8 @@ class ComposedModel(nn.Module):
             self.output_layer = nn.Softmax(dim=-1)
         else:
             self.output_layer = nn.Identity()  # if yes, add an Identity layer
+        self.is_single_branch = False #  refer to the definition of single_branch_model
+        self.num_layers = count_num_layers(self.model) # refer to the definition of num_layers
 
     def forward(self, x):
         if self.need_normalize:
@@ -61,7 +45,7 @@ class ComposedModel(nn.Module):
         x = self.output_layer(x)
         return x
 
-    def compute_loss(self, inputs, targets):
+    def get_loss(self, inputs, targets):
         """Compute loss for given inputs and targets.
 
         Args:
@@ -69,9 +53,11 @@ class ComposedModel(nn.Module):
             targets (Tensor): batch of targets.
 
         Returns:
+            outputs (Tensor): batch of outputs.
             loss (Tensor): loss value.
         """
-        return F.cross_entropy(self.model(inputs), targets)
+        outputs = self.model(inputs)
+        return outputs,F.cross_entropy(outputs, targets)
 
     def _configure_normalization(self, mean, std):
         """Configure normalization layer.

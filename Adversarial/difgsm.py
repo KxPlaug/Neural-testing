@@ -2,7 +2,6 @@ from Adversarial.attack import Attack
 import torch.nn.functional as F
 import torch
 
-
 class DIFGSM(Attack):
     r"""
     DI2-FGSM in the paper 'Improving Transferability of Adversarial Examples with Input Diversity'

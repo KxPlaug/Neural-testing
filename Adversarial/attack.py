@@ -73,7 +73,7 @@ class Attack(object):
 
     
     def get_loss(self, inputs, labels, *args, **kwargs):
-        loss = self.model.compute_loss(inputs, labels)
+        _,loss = self.model.get_loss(inputs, labels)
         return loss
 
     @wrapper_method
