@@ -10,7 +10,7 @@ import torch.nn.parallel
 import torch.optim
 import torch.utils.data
 import torch.utils.data.distributed
-
+import pickle
 from importlib import import_module
 from Pruning.utils import get_n_params, get_n_flops, get_n_params_, get_n_flops_, parse_prune_ratio_vgg, strlist_to_list
 from Pruning.utils import add_noise_to_model, compute_jacobian
@@ -20,8 +20,7 @@ from utils import check_device
 device = check_device()
 
 
-def apply_mask_forward(model):
-    global mask
+def apply_mask_forward(model, mask):
     for name, m in model.named_modules():
         if name in mask:
             m.weight.data.mul_(mask[name])
@@ -115,20 +114,28 @@ def validate(val_loader, model):
     return top1.avg.item(), top5.avg.item(), losses.avg
 
 class GReg:
-    def __init__(self, img_size=224, num_classes=1000, num_chennels=3, lr=0.1, momentum=0.9, weight_decay=1e-4):
+    def __init__(self, img_size=224, num_classes=1000, num_chennels=3, momentum=0.9, weight_decay=1e-4,
+                 reg_granularity_recover=1e-4,reg_granularity_prune=1e-4,reg_granularity_pick=1e-5,
+                 reg_upper_limit_pick=1e-2,reg_upper_limit=1.0,lr_prune=0.001,
+                 test_interval=2000,update_reg_interval=5,stabilize_reg_interval=40000):
         self.img_size = img_size
         self.num_classes = num_classes
         self.num_channels = num_chennels
-        self.lr = lr
         self.momentum = momentum
         self.weight_decay = weight_decay
-        self.mask = None
+        self.reg_granularity_recover = reg_granularity_recover
+        self.reg_granularity_prune = reg_granularity_prune
+        self.reg_granularity_pick = reg_granularity_pick
+        self.reg_upper_limit_pick = reg_upper_limit_pick
+        self.reg_upper_limit = reg_upper_limit
+        self.lr_prune = lr_prune
+        self.test_interval = test_interval
+        self.update_reg_interval = update_reg_interval
+        self.stabilize_reg_interval = stabilize_reg_interval
 
-    def _init_model(self, model, train_loader_prune, test_loader,n_conv_within_block=3,res=True,
+    def __call__(self, model, train_loader_prune, test_loader,save_path,n_conv_within_block=3,res=True,
                     stage_pr="[0,0.675,0.675,0.675,0.675,0.675]",skip_layers="",pick_pruned="min"):
         pruner = None
-        global mask
-
         class passer:
             pass
         passer.test = validate
@@ -144,9 +151,14 @@ class GReg:
         else: # e.g., resnet
             passer.stage_pr = strlist_to_list(stage_pr, float) # example: [0, 0.4, 0.5, 0]
             passer.skip_layers = strlist_to_list(skip_layers, str) 
-        passer.stage_pr = stage_pr
-        passer.skip_layers = skip_layers
         passer.pick_pruned = pick_pruned
-        pruner = Pruner(model.model,passer)
+        pruner = Pruner(model,passer,reg_granularity_recover=self.reg_granularity_recover,reg_granularity_prune=self.reg_granularity_prune,reg_granularity_pick=self.reg_granularity_pick,
+                 reg_upper_limit_pick=self.reg_upper_limit_pick,reg_upper_limit=self.reg_upper_limit,lr_prune=self.lr_prune,momentum=self.momentum,weight_decay=self.weight_decay,
+                 test_interval=self.test_interval,update_reg_interval=self.update_reg_interval,stabilize_reg_interval=self.stabilize_reg_interval)
         pruner.prune()
         mask = pruner.mask
+        pickle.dump(mask,open(save_path,"wb"))
+        pruned_model = pruner.original_model
+        pruned_model = apply_mask_forward(pruned_model,mask)
+        return pruned_model
+

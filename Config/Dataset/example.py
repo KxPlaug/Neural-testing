@@ -14,7 +14,7 @@ def load_dataset():
         parent_dir, 'imagenet_1k/imagenet_y_batch.pt'), map_location=torch.device('cpu'))[:20]
     x_batch = Resize((224, 224))(x_batch)
     dataset = TensorDataset(x_batch, y_batch)
-    return dataset
+    return train_dataset,test_dataset
 
 
 if __name__ == "__main__":

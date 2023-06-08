@@ -6,6 +6,7 @@ import numpy as np
 from math import ceil
 from collections import OrderedDict
 from Pruning.utils import strdict_to_dict
+from tqdm.notebook import tqdm
 
 class Layer:
     def __init__(self, name, size, layer_index, res=False):
@@ -23,26 +24,26 @@ class Layer:
             Same stage means the same feature map size.
         '''
         global lastest_stage # an awkward impel, just for now
+        name = name[6:]
         if name.startswith('module.'):
             name = name[7:] # remove the prefix caused by pytorch data parallel
-
         if "conv1" == name: # TODO: this might not be so safe
             lastest_stage = 0
             return 0, None, None
         if "linear" in name or 'fc' in name: # Note: this can be risky. Check it fully. TODO: @mingsun-tse
             return lastest_stage + 1, None, None # fc layer should always be the last layer
         else:
-            try:
-                stage  = int(name.split(".")[0][-1]) # ONLY work for standard resnets. name example: layer2.2.conv1, layer4.0.downsample.0
-                seq_ix = int(name.split(".")[1])
-                if 'conv' in name.split(".")[-1]:
-                    blk_ix = int(name[-1]) - 1
-                else:
-                    blk_ix = -1 # shortcut layer  
-                lastest_stage = stage
-                return stage, seq_ix, blk_ix
-            except:
-                print('!Parsing the layer name failed: %s. Please check.' % name)
+            # try:
+            stage  = int(name.split(".")[0][-1]) # ONLY work for standard resnets. name example: layer2.2.conv1, layer4.0.downsample.0
+            seq_ix = int(name.split(".")[1])
+            if 'conv' in name.split(".")[-1]:
+                blk_ix = int(name[-1]) - 1
+            else:
+                blk_ix = -1 # shortcut layer  
+            lastest_stage = stage
+            return stage, seq_ix, blk_ix
+            # except:
+            #     print('!Parsing the layer name failed: %s. Please check.' % name)
                 
 class MetaPruner:
     def __init__(self, model, passer):
@@ -91,7 +92,6 @@ class MetaPruner:
                 max_len_name = max(max_len_name, len(name))
                 
                 size = m.weight.size()
-                print(size)
                 self.layers[name] = Layer(name, size, ix, self.res)
         
         max_len_ix = len("%s" % ix)
@@ -197,14 +197,13 @@ class MetaPruner:
 
         self.pr = {}
         for name, m in self.model.named_modules():
-            print(name)
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
                 self.pr[name] = get_layer_pr(name)
         print(self.pr)
 
     def _get_kept_wg_L1(self):
         wg = 'weight'
-        for name, m in self.model.named_modules():
+        for name, m in tqdm(self.model.named_modules(),total=len(list(self.model.named_modules()))):
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
                 score = m.weight.abs().flatten()
                 self.pruned_wg[name] = self._pick_pruned(score, self.pr[name], self.pick_pruned)
@@ -224,4 +223,3 @@ class MetaPruner:
                 pruned = self.pruned_wg[name]
                 mask[pruned] = 0
                 self.mask[name] = mask.view_as(m.weight.data)
-        self.logprint('Get masks done for weight pruning')
