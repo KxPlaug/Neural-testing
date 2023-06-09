@@ -7,6 +7,7 @@ import copy
 import pickle
 import re
 device = check_device()
+print(device)
 
 
 def parse_param(param):

@@ -14,8 +14,7 @@ def check_device() -> torch.device:
     except:
         value.to("mps")
         return torch.device("mps")
-    finally:
-        return torch.device("cpu")
+    return torch.device("cpu")
     
 def count_num_layers(model):
     num_conv_layers = 0
