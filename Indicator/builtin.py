@@ -1,21 +1,24 @@
 import os
-import csv
 import torch
 import torch.nn as nn
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
+import pandas as pd
 from utils import check_device
 from tqdm import tqdm
+import numpy as np
 
-def compute_metrics(model, dataloader):
+
+def compute_classification_metrics(model, dataloader, experiment_name, num_classes=1000):
+    """_description_
+
+    Args:
+        model (_type_): pytorch model
+        dataloader (_type_): your dataloader
+        experiment_name (_type_): name of your experiment
+    """
     device = check_device()
-    model = model.to(device)
-    model.eval()
 
-    criterion = nn.CrossEntropyLoss()
-
-    total_samples = 0
-    total_correct = 0
-    total_loss = 0.0
+    losses = []
     true_labels = []
     predicted_labels = []
 
@@ -24,39 +27,50 @@ def compute_metrics(model, dataloader):
             images = images.to(device)
             labels = labels.to(device)
 
-            outputs = model(images)
-            _, predicted = torch.max(outputs.data, 1)
+            outputs, loss = model.get_loss(images, labels)
+            losses.append(loss.item())
 
-            total_samples += labels.size(0)
-            total_correct += (predicted == labels).sum().item()
-            total_loss += criterion(outputs, labels).item() * labels.size(0)
+            true_labels.append(labels.cpu().numpy())
+            predicted_labels.append(outputs.cpu().numpy())
 
-            true_labels.extend(labels.cpu().numpy())
-            predicted_labels.extend(predicted.cpu().numpy())
+    average_loss = np.mean(losses)
+    true_labels = np.concatenate(true_labels)
+    predicted_labels = np.concatenate(predicted_labels)
+    accuracy = np.mean(true_labels == predicted_labels.argmax(-1))
+    cnf_confusion_matrix = confusion_matrix(
+        true_labels, predicted_labels.argmax(-1))
+    FP = cnf_confusion_matrix.sum(axis=0) - np.diag(cnf_confusion_matrix)
+    TP = np.diag(cnf_confusion_matrix)
+    FN = cnf_confusion_matrix.sum(axis=1) - np.diag(cnf_confusion_matrix)
+    TN = cnf_confusion_matrix.sum() - (FP + FN + TP)
 
-    accuracy = total_correct / total_samples
-    average_loss = total_loss / total_samples
+    TPR = TP/(TP+FN)
+    TNR = TN/(TN+FP)
+    PPV = TP/(TP+FP)
+    NPV = TN/(TN+FN)
+    FPR = FP/(FP+TN)
+    FNR = FN/(TP+FN)
+    FDR = FP/(TP+FP)
+    TPR = np.mean(TPR)
+    TNR = np.mean(TNR)
+    PPV = np.mean(PPV)
+    NPV = np.mean(NPV)
+    FPR = np.mean(FPR)
+    FNR = np.mean(FNR)
+    FDR = np.mean(FDR)
+    ROC_AUC = roc_auc_score(true_labels, predicted_labels, multi_class='ovo')
 
     class_report = classification_report(
-        true_labels, predicted_labels, output_dict=True)
+        true_labels, predicted_labels.argmax(-1), output_dict=True,digits=4,labels=list(range(num_classes)))
 
-    # return accuracy, average_loss, class_report
-    save_metrics_to_csv(accuracy, average_loss, class_report)
-
-
-def save_metrics_to_csv(accuracy, loss, class_report,experiment_name):
+    metrics = {"Metric": ["Accuracy", "Loss", "TPR", "TNR", "PPV", "NPV", "FPR", "FNR", "FDR", "ROC_AUC"],
+               "Value": [accuracy, average_loss, TPR, TNR, PPV, NPV, FPR, FNR, FDR, ROC_AUC]}
+    metrics = pd.DataFrame(metrics)
     os.makedirs(f'outputs/Indicator/{experiment_name}', exist_ok=True)
-    filename = f'outputs/Indicator/{experiment_name}/metrics.csv'
-
-    with open(filename, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Metric', 'Value'])
-        writer.writerow(['Accuracy', accuracy])
-        writer.writerow(['Loss', loss])
-        writer.writerow([])  # Empty row for separation
-        writer.writerow(['Class', 'Precision', 'Recall', 'F1-Score'])
-
-        for label, metrics in class_report.items():
-            if label != 'accuracy' and label != 'macro avg' and label != 'weighted avg':
-                writer.writerow([label, metrics['precision'],
-                                metrics['recall'], metrics['f1-score']])
+    metrics = metrics.round(4)
+    metrics.to_csv(
+        f'outputs/Indicator/{experiment_name}/metrics.csv', index=False)
+    class_report = pd.DataFrame(class_report).transpose()
+    class_report = class_report.round(4)
+    class_report.to_csv(
+        f'outputs/Indicator/{experiment_name}/class_report.csv')

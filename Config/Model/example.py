@@ -3,8 +3,8 @@ from torchvision.transforms import Normalize
 import torch.nn.functional as F
 import torch
 from torchvision.models import resnet50, ResNet50_Weights
-from utils import count_num_layers
-
+from utils import count_num_layers,check_device
+device = check_device()
 
 MEAN = [0.485, 0.456, 0.406]  # MODIFY THIS LINE
 STD = [0.229, 0.224, 0.225]  # MODIFY THIS LINE
@@ -37,7 +37,9 @@ class ComposedModel(nn.Module):
             self.output_layer = nn.Identity()  # if yes, add an Identity layer
         self.is_single_branch = False #  refer to the definition of single_branch_model
         self.num_layers = count_num_layers(self.model) # refer to the definition of num_layers
-
+        self.eval()
+        self.to(device)
+        
     def forward(self, x):
         if self.need_normalize:
             x = self.normalize(x)
