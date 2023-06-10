@@ -9,12 +9,14 @@ def check_device() -> torch.device:
     """
     value = torch.Tensor([0])
     try:
-        value.to("cuda")
-        return torch.device("cuda")
+        try:
+            value.to("cuda")
+            return torch.device("cuda")
+        except:
+            value.to("mps")
+            return torch.device("mps")
     except:
-        value.to("mps")
-        return torch.device("mps")
-    return torch.device("cpu")
+        return torch.device("cpu")
     
 def count_num_layers(model):
     num_conv_layers = 0

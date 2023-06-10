@@ -7,7 +7,6 @@ import copy
 import pickle
 import re
 device = check_device()
-print(device)
 
 
 def parse_param(param):
@@ -72,7 +71,7 @@ class Taylor:
                          for param in self.all_param_names]
         combine = [np.abs(total * weight**2)
                    for total, weight in zip(totals, param_weights)]
-        combine = np.array(combine)
+        # combine = np.array(combine)
         combine_flatten = np.concatenate(
             [combine_.flatten() for combine_ in combine], axis=0)
         percentile = 100 - self.thre * 100
@@ -97,7 +96,7 @@ class Taylor:
         self.net = net
         self.original_net = copy.deepcopy(net)
         self.train_dataloader = train_dataloader
-        self.thre = pruning_ratio
+        self.thre = 1 - pruning_ratio
         self._get_total()
         self._calculate_param_remove()
         self._prune_model()
