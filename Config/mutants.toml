@@ -1,0 +1,17 @@
+[labelerror]
+p=0.5
+num_classes=10
+
+[datamissing]
+p=0.5
+
+[noiseperturb]
+std=0.1
+
+[contrastratio]
+min_ratio=0.8
+max_ratio=1.2
+
+[brightness]
+min_shift=-0.1
+max_shift=0.1

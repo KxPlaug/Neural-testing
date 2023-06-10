@@ -4,6 +4,8 @@ import numpy as np
 import torch.nn.functional as F
 import torchvision
 import os
+from utils import check_device
+device = check_device()
 
 models_path = './models/'
 
@@ -150,9 +152,8 @@ class ResnetBlock(nn.Module):
         return out
 
 
-class AdvGAN_Attack:
+class AdvGAN:
     def __init__(self,
-                 device,
                  model,
                  model_num_labels,
                  image_nc=3,
