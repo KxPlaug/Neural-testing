@@ -4,7 +4,7 @@ from torchvision import transforms as T
 from tqdm import tqdm
 import numpy as np
 from PIL import Image
-from dct import *
+from Adversarial.dct import *
 import numpy as np
 import scipy.stats as st
 import torch.nn.functional as F

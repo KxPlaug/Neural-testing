@@ -1,0 +1,6 @@
+[config]
+model=custom
+dataset=cifar10
+
+[mutants]
+attack=true
