@@ -174,7 +174,7 @@ class CausalMetric():
             finish = img_batch.clone()
 
         # While not all pixels are changed
-        for i in range(n_steps+1):
+        for i in tqdm(range(n_steps+1)):
             # Iterate over batches
             for j in range(n_samples // batch_size):
                 # Compute new scores
@@ -189,4 +189,5 @@ class CausalMetric():
                 for rr in r:
                     start.cpu().numpy().reshape(n_samples, 3, self.hw)[rr, :, coords.reshape(n_samples, 3, n_steps)[
                         rr]] = finish.cpu().numpy().reshape(n_samples, 3, self.hw)[rr, :, coords.reshape(n_samples, 3, n_steps)[rr]]
+        print('AUC: {}'.format(auc(scores.mean(1))))
         return scores.transpose()

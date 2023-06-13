@@ -1,21 +1,20 @@
 [Config]
-model="example"
-dataset="example"
+model="custom"
+dataset="cifar10"
 
-[Mutants]
-    [Mutants.datamissing]
-    input="test_dataloader"
-    output="missed_test_dataloader"
+# [Mutants]
+#     [Mutants.datamissing]
+#     input="test_dataloader"
+#     output="missed_test_dataloader"
 
-[Adversarial]
-    [Adversarial.fgsm]
-    input="missed_test_dataloader"
-    save="True"
-        [Adversarial.fgsm.transfer_models]
+# [Adversarial]
+#     [Adversarial.fgsm]
+#     input="missed_test_dataloader"
+#     save="True"
 
-    [Adversarial.bim]
-    input="test_dataloader"
-    save="True"
+#     [Adversarial.bim]
+#     input="test_dataloader"
+#     save="True"
 
 [Explanation]
     [Explanation.fast_ig]
@@ -23,11 +22,11 @@ dataset="example"
     save="True"
     evaluate="True"
 
-    [Explanation.agi]
+    [Explanation.saliencymap]
     input="test_dataloader"
     save="True"
     evaluate="True"
 
-[Pruning]
-    [Pruning.asl]
-    input="train_dataloader"
+# [Pruning]
+#     [Pruning.asl]
+#     input="train_dataloader"

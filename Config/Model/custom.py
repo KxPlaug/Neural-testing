@@ -112,11 +112,9 @@ TYPE = 'Image Classification'
 #     'vgg',
 # ]
 
-
-class ComposedModel(nn.Module):
-    def __init__(self):
-        super().__init__()
-        # modify this line to use your own model
+class ComposedModel():
+    def get_model(self):
+         # modify this line to use your own model
         self.model = ResNet(Bottleneck, [3, 4, 6, 3], num_classes=NUM_CLASSES)
         state_dict = torch.load(
             f"Config/Model/weights/cifar10_resnet50_weights.pth", map_location=device)
@@ -125,27 +123,26 @@ class ComposedModel(nn.Module):
                 state_dict[key[7:]] = state_dict[key]
                 del state_dict[key]
         self.model.load_state_dict(state_dict)
+        self.output_model = nn.Sequential()
         self._configure_normalization(MEAN, STD)
         # if dataset is normalized, then no need to normalize again
         self.need_normalize = True
+        if self.need_normalize:
+            self.normalize = Normalize(MEAN, STD)
+            self.output_model.add_module('normalize', self.normalize)
+        self.output_model.add_module('model', self.model)
         # check if the last layer is Softmax or not
         if not self._check_last_layer(list(self.model.children())[-1]):
             # if not, add a Softmax layer
             self.output_layer = nn.Softmax(dim=-1)
-        else:
-            self.output_layer = nn.Identity()  # if yes, add an Identity layer
-        self.is_single_branch = False  # refer to the definition of single_branch_model
-        # refer to the definition of num_layers
-        self.num_layers = count_num_layers(self.model)
-        self.eval()
-        self.to(device)
-
-    def forward(self, x):
-        if self.need_normalize:
-            x = self.normalize(x)
-        x = self.model(x)
-        x = self.output_layer(x)
-        return x
+            self.output_model.add_module('output_layer', self.output_layer)
+        self.is_single_branch = False #  refer to the definition of single_branch_model
+        self.num_layers = count_num_layers(self.model) # refer to the definition of num_layers
+        self.output_model.eval()
+        self.output_model.to(device)
+        self.output_model.get_loss = self.get_loss
+        return self.output_model
+        
 
     def get_loss(self, inputs, targets):
         """Compute loss for given inputs and targets.
@@ -158,8 +155,8 @@ class ComposedModel(nn.Module):
             outputs (Tensor): batch of outputs.
             loss (Tensor): loss value.
         """
-        outputs = self(inputs)
-        return outputs, F.cross_entropy(outputs, targets)
+        outputs = self.output_model(inputs)
+        return outputs,F.cross_entropy(outputs, targets)
 
     def _configure_normalization(self, mean, std):
         """Configure normalization layer.
