@@ -117,7 +117,8 @@ class GReg:
     def __init__(self, img_size=224, num_classes=1000, num_chennels=3, momentum=0.9, weight_decay=1e-4,
                  reg_granularity_recover=1e-4,reg_granularity_prune=1e-4,reg_granularity_pick=1e-5,
                  reg_upper_limit_pick=1e-2,reg_upper_limit=1.0,lr_prune=0.001,
-                 test_interval=2000,update_reg_interval=5,stabilize_reg_interval=40000):
+                 test_interval=2000,update_reg_interval=5,stabilize_reg_interval=40000,n_conv_within_block=3,res=True,
+                 stage_pr="[0,0.675,0.675,0.675,0.675,0.675]",skip_layers="",pick_pruned="min"):
         self.img_size = img_size
         self.num_classes = num_classes
         self.num_channels = num_chennels
@@ -132,9 +133,18 @@ class GReg:
         self.test_interval = test_interval
         self.update_reg_interval = update_reg_interval
         self.stabilize_reg_interval = stabilize_reg_interval
+        self.n_conv_within_block = n_conv_within_block
+        self.res = res
+        self.stage_pr = stage_pr
+        self.skip_layers = skip_layers
+        self.pick_pruned = pick_pruned
 
-    def __call__(self, model, train_loader_prune, test_loader,save_path,n_conv_within_block=3,res=True,
-                    stage_pr="[0,0.675,0.675,0.675,0.675,0.675]",skip_layers="",pick_pruned="min"):
+    def __call__(self, model, train_loader_prune, test_loader,save_path):
+        n_conv_within_block = self.n_conv_within_block
+        res = self.res
+        stage_pr = self.stage_pr
+        skip_layers = self.skip_layers
+        pick_pruned = self.pick_pruned
         pruner = None
         class passer:
             pass

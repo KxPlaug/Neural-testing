@@ -1,10 +1,10 @@
-from .advGan import AdvGAN
-from .bim import BIM
-from .cw import CW
-from .difgsm import DIFGSM
-from .fgsm import FGSM
-from .mifgsm import MIFGSM
-from .pgd import PGD
-from .sinifgsm import SINIFGSM
-from .ssa import SSA
-from .tifgsm import TIFGSM
+from .advGan import AdvGAN as advgan
+from .bim import BIM as bim
+from .cw import CW as cw
+from .difgsm import DIFGSM as difgsm
+from .fgsm import FGSM as fgsm
+from .mifgsm import MIFGSM as mifgsm
+from .pgd import PGD as pgd
+from .sinifgsm import SINIFGSM as sinifgsm
+from .ssa import SSA as ssa
+from .tifgsm import TIFGSM as tifgsm

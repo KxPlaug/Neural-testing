@@ -8,7 +8,6 @@ device = check_device()
 
 MEAN = [0.485, 0.456, 0.406]  # MODIFY THIS LINE
 STD = [0.229, 0.224, 0.225]  # MODIFY THIS LINE
-NEED_NORMALIZE = True  # MODIFY THIS LINE
 NUM_CLASSES = 1000  # MODIFY THIS LINE
 INPUT_SIZE = (224, 224)  # MODIFY THIS LINE
 TYPE = 'Image Classification'  # MODIFY THIS LINE, options: 'Image Classification', 'Object Detection', 'Text Classification'
@@ -28,7 +27,7 @@ class ComposedModel(nn.Module):
             progress=True))  # modify this line to load your own model weights
         self._configure_normalization(MEAN, STD)
         # if dataset is normalized, then no need to normalize again
-        self.need_normalize = NEED_NORMALIZE
+        self.need_normalize = True
         # check if the last layer is Softmax or not
         if not self._check_last_layer(list(self.model.children())[-1]):
             # if not, add a Softmax layer

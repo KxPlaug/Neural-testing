@@ -1,6 +1,33 @@
-[config]
-model=custom
-dataset=cifar10
+[Config]
+model="example"
+dataset="example"
 
-[mutants]
-attack=true
+[Mutants]
+    [Mutants.datamissing]
+    input="test_dataloader"
+    output="missed_test_dataloader"
+
+[Adversarial]
+    [Adversarial.fgsm]
+    input="missed_test_dataloader"
+    save="True"
+        [Adversarial.fgsm.transfer_models]
+
+    [Adversarial.bim]
+    input="test_dataloader"
+    save="True"
+
+[Explanation]
+    [Explanation.fast_ig]
+    input="test_dataloader"
+    save="True"
+    evaluate="True"
+
+    [Explanation.agi]
+    input="test_dataloader"
+    save="True"
+    evaluate="True"
+
+[Pruning]
+    [Pruning.asl]
+    input="train_dataloader"

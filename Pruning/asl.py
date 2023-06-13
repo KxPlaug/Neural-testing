@@ -77,7 +77,7 @@ def count_parameters(model):
 
 
 class ASL:
-    def __init__(self, lv=10.0, epochs=1000, lr=0.1, sparsity='adaptive', pthres=1000):
+    def __init__(self, lv=10.0, epochs=1000, lr=0.1, sparsity='adaptive', pthres=1000, pruning_ratio=0.65):
         """
 
         Args:
@@ -92,6 +92,7 @@ class ASL:
         self.lr = lr
         self.sparsity = sparsity
         self.pthres = pthres
+        self.pruning_ratio = pruning_ratio
 
     def _init_model(self, model):
         self.model = model
@@ -142,9 +143,9 @@ class ASL:
                     len(data), len(self.train_dataloader.dataset),
                     100. * batch_idx / len(self.train_dataloader), loss.item()))
 
-    def __call__(self, model, train_dataloader, save_path, pruning_ratio=0.65):
+    def __call__(self, model, train_dataloader, save_path):
         self.train_dataloader = train_dataloader
-        self.starget = pruning_ratio
+        self.starget = self.pruning_ratio
         self._init_model(model)
         for epoch in range(1, self.epochs + 1):
             self.train(epoch)

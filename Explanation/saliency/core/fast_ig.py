@@ -7,6 +7,6 @@ class FastIG:
 
     def __call__(self, data, target):
         data.requires_grad_()
-        loss = self.model.get_loss(data, target)
+        _,loss = self.model.get_loss(data, target)
         loss.backward()
         return (data * data.grad).detach().cpu().numpy()

@@ -148,7 +148,7 @@ class CausalMetric():
         n_samples = img_batch.shape[0]
         predictions = torch.FloatTensor(n_samples, self.num_classes)
         assert n_samples % batch_size == 0
-        for i in tqdm(range(n_samples // batch_size), desc='Predicting labels'):
+        for i in range(n_samples // batch_size):
             preds = self.model(
                 img_batch[i*batch_size:(i+1)*batch_size].to(device)).detach().cpu()
             predictions[i*batch_size:(i+1)*batch_size] = preds
@@ -160,7 +160,7 @@ class CausalMetric():
         r = np.arange(n_samples).reshape(n_samples, 1)
 
         substrate = torch.zeros_like(img_batch)
-        for j in tqdm(range(n_samples // batch_size), desc='Substrate'):
+        for j in range(n_samples // batch_size):
             substrate[j*batch_size:(j+1)*batch_size] = self.substrate_fn(
                 img_batch[j*batch_size:(j+1)*batch_size])
 
@@ -174,7 +174,7 @@ class CausalMetric():
             finish = img_batch.clone()
 
         # While not all pixels are changed
-        for i in tqdm(range(n_steps+1), desc=caption + 'pixels'):
+        for i in range(n_steps+1):
             # Iterate over batches
             for j in range(n_samples // batch_size):
                 # Compute new scores
@@ -189,5 +189,4 @@ class CausalMetric():
                 for rr in r:
                     start.cpu().numpy().reshape(n_samples, 3, self.hw)[rr, :, coords.reshape(n_samples, 3, n_steps)[
                         rr]] = finish.cpu().numpy().reshape(n_samples, 3, self.hw)[rr, :, coords.reshape(n_samples, 3, n_steps)[rr]]
-        print('AUC: {}'.format(auc(scores.mean(1))))
         return scores.transpose()

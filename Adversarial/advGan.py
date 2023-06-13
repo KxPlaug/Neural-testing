@@ -155,11 +155,12 @@ class ResnetBlock(nn.Module):
 class AdvGAN:
     def __init__(self,
                  model,
-                 model_num_labels,
+                 model_num_labels=1000,
                  image_nc=3,
                  box_min=0,
                  box_max=1,
-                 eps=16.0 / 255
+                 eps=16.0 / 255,
+                 epochs=50,
                  ):
         output_nc = image_nc
         self.device = device
@@ -184,6 +185,8 @@ class AdvGAN:
                                             lr=0.001)
         self.optimizer_D = torch.optim.Adam(self.netDisc.parameters(),
                                             lr=0.001)
+        
+        self.epochs = epochs
 
         if not os.path.exists(models_path):
             os.makedirs(models_path)
@@ -255,7 +258,8 @@ class AdvGAN:
 
         return loss_D_GAN.item(), loss_G_fake.item(), loss_perturb.item(), loss_adv.item()
 
-    def train(self, train_dataloader, epochs=50):
+    def train(self, train_dataloader):
+        epochs = self.epochs
         for epoch in range(1, epochs+1):
 
             if epoch == 50:
@@ -301,7 +305,7 @@ class AdvGAN:
         self.netG.load_state_dict(torch.load(checkpoint_path,map_location=self.device))
         self.trained = True
 
-    def __call__(self, x):
+    def __call__(self, x,y):
         if not self.trained:
             raise Exception('Model not trained, please call train() first.')
         perturbation = self.netG(x)

@@ -4,6 +4,7 @@ box_min=0
 box_max=1
 eps="16/255"
 epochs=50
+model_num_labels=1000
 
 [fgsm]
 eps="8/255"

@@ -37,8 +37,9 @@ def get_all_param_names(model):
 
 
 class Taylor:
-    def __init__(self, alpha=0.000001):
+    def __init__(self, alpha=0.000001, pruning_ratio=0.65):
         self.alpha = alpha
+        self.pruning_ratio = pruning_ratio
 
     def _get_grad(self, param):
         param = parse_param(param)
@@ -92,11 +93,11 @@ class Taylor:
                         "model": self.original_net, "param_remove": self.param_remove, "param": param, "param_": param_})
         self.pruned_net = self.original_net
 
-    def __call__(self, net, train_dataloader, save_path, pruning_ratio=0.65):
+    def __call__(self, net, train_dataloader, save_path):
         self.net = net
         self.original_net = copy.deepcopy(net)
         self.train_dataloader = train_dataloader
-        self.thre = 1 - pruning_ratio
+        self.thre = 1 - self.pruning_ratio
         self._get_total()
         self._calculate_param_remove()
         self._prune_model()

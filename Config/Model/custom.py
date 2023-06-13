@@ -101,7 +101,6 @@ class ResNet(nn.Module):
 
 MEAN = [0.5, 0.5, 0.5]  # MODIFY THIS LINE
 STD = [0.5, 0.5, 0.5]  # MODIFY THIS LINE
-NEED_NORMALIZE = True  # MODIFY THIS LINE
 NUM_CLASSES = 10  # MODIFY THIS LINE
 INPUT_SIZE = (32, 32)  # MODIFY THIS LINE
 # MODIFY THIS LINE, options: 'Image Classification', 'Object Detection', 'Text Classification'
@@ -128,7 +127,7 @@ class ComposedModel(nn.Module):
         self.model.load_state_dict(state_dict)
         self._configure_normalization(MEAN, STD)
         # if dataset is normalized, then no need to normalize again
-        self.need_normalize = NEED_NORMALIZE
+        self.need_normalize = True
         # check if the last layer is Softmax or not
         if not self._check_last_layer(list(self.model.children())[-1]):
             # if not, add a Softmax layer
