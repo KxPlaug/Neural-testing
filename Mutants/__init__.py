@@ -4,3 +4,10 @@ from .core import DataShuffle as datashuffle
 from .core import ContrastRatio as contrastratio
 from .core import Brightness as brightness
 from .core import NoisePerturb as noiseperturb
+from .core import RandomCrop as randomcrop
+from .core import DataMissingOD as datamissingod
+from .core import DataShuffleOD as datashuffleod
+from .core import ContrastRatioOD as contrastratiood
+from .core import BrightnessOD as brightnessod
+from .core import NoisePerturbOD as noiseperturbod
+from .core import RandomCropOD as randomcropod

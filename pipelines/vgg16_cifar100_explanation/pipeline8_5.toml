@@ -1,0 +1,12 @@
+[Config]
+model="vgg16_cifar100"
+dataset="cifar100"
+name="vgg16_cifar100_explanation"
+
+[Explanation_1]
+
+    [Explanation_1.saliencymap]
+    input="test_dataloader"
+    save="True"
+    evaluate="True"
+    all_load="True"

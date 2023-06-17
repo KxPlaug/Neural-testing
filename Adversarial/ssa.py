@@ -114,7 +114,7 @@ class SSA:
 
                 # DI-FGSM https://arxiv.org/abs/1803.06978
                 # output_v3 = model(DI(x_idct))
-                loss = self.model.get_loss(x_idct, labels)
+                _,loss = self.model.get_loss(x_idct, labels)
                 loss.backward()
                 noise += x_idct.grad.data
             noise = noise / self.N

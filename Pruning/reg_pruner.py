@@ -172,7 +172,7 @@ class Pruner(MetaPruner):
                 if finish_update_reg:
                     # after 'update_reg' stage, keep the reg to stabilize weight magnitude
                     self.iter_update_reg_finished[name] = self.total_iter
-                    self.logprint("==> [%d] Just finished 'update_reg'. Iter = %d" % (cnt_m, self.total_iter))
+                    print("==> [%d] Just finished 'update_reg'. Iter = %d" % (cnt_m, self.total_iter))
 
                     # check if all layers finish 'update_reg'
                     self.prune_state = "stabilize_reg"
@@ -215,7 +215,7 @@ class Pruner(MetaPruner):
                 # test
                 if total_iter % self.test_interval == 0:
                     acc1, acc5, *_ = self.test(self.model)
-                    self.accprint("Acc1 = %.4f Acc5 = %.4f Iter = %d (before update) [prune_state = %s]" % 
+                    print("Acc1 = %.4f Acc5 = %.4f Iter = %d (before update) [prune_state = %s]" % 
                         (acc1, acc5, total_iter, self.prune_state))
                 
                     

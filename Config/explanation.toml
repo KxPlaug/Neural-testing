@@ -4,13 +4,18 @@ steps=15
 [agi]
 epsilon=0.05
 max_iter=20
-topk=20
+# topk=20 # imagenet
+topk=2 # cifar100
+# num_classes=1000 # imagenet
+num_classes=100 # cifar100
 
 [big]
 data_min=0
 data_max=1
-epsilons="[36, 64, 0.3 * 255, 0.5 * 255, 0.7 * 255, 0.9 * 255, 1.1 * 255]"
-gradient_steps=50
+# epsilons="[36, 64, 0.3 * 255, 0.5 * 255, 0.7 * 255, 0.9 * 255, 1.1 * 255]"
+epsilons="[0.1 * 255, 0.3 * 255, 0.5 * 255]" # cifar100
+# gradient_steps=40
+gradient_steps=20 #cifar100
 
 [ig]
 gradient_steps=50

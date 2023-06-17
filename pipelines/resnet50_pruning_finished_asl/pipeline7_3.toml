@@ -1,0 +1,13 @@
+[Config]
+model="resnet50_cifar100"
+dataset="cifar100"
+name="resnet50_pruning_finished_asl"
+mask="Outputs/pruning_resnent50_cifar100/Pruning_1/asl/0.35/mask.pkl"
+
+[Explanation_1]
+
+    [Explanation_1.sg]
+    input="test_dataloader"
+    save="True"
+    evaluate="True"
+    all_load="True"

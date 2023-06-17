@@ -161,3 +161,13 @@ cython_debug/
 data/
 *.pt
 outputs/
+*.txt
+*.jpg
+*.sh
+*.pdf
+*.png
+*.ipynb
+*.csv
+*.json
+Config/Dataset/coco/*
+Config/Dataset/imagenet_1k/*

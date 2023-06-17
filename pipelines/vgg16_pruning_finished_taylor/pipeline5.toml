@@ -1,0 +1,10 @@
+[Config]
+model="vgg16_cifar100"
+dataset="cifar100"
+name="vgg16_pruning_finished_taylor_0.5"
+mask="Outputs/pruning_vgg16_cifar100/Pruning_1/taylor/0.5/mask.pkl"
+
+[Indicator]
+    [Indicator.builtin]
+    input="test_dataloader"
+    model="model"

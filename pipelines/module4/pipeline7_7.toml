@@ -1,0 +1,11 @@
+[Config]
+model="resnet50_imagenet"
+dataset="imagenet"
+name="20230615-005251"
+
+[Explanation_1]
+
+    [Explanation_1.agi]
+    input="test_dataloader"
+    save="True"
+    evaluate="True"

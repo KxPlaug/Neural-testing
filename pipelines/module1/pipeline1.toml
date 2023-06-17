@@ -1,0 +1,8 @@
+[Config]
+model="resnet50_cifar100"
+dataset="cifar100"
+
+[Indicator]
+    [Indicator.builtin]
+    input="test_dataloader"
+    model="model"

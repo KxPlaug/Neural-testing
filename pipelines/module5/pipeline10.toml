@@ -1,0 +1,9 @@
+[Config]
+model="resnet50_cifar100"
+dataset="cifar100"
+name="pruning_045"
+
+[Pruning_1]
+    [Pruning_1.asl]
+    input="train_dataloader"
+    output="asl_pruned_model_0_45"

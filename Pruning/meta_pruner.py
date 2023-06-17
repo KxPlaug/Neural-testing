@@ -6,7 +6,7 @@ import numpy as np
 from math import ceil
 from collections import OrderedDict
 from Pruning.utils import strdict_to_dict
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 
 class Layer:
     def __init__(self, name, size, layer_index, res=False):
@@ -62,7 +62,7 @@ class MetaPruner:
         self.pruned_wg = {}
         self.get_pr() # set up pr for each layer
         
-    def _pick_pruned(self, w_abs, pr, mode="min"):
+    def _pick_pruned(self, w_abs, pr, mode="minimum"):
         if pr == 0:
             return []
         w_abs_list = w_abs.flatten()
@@ -70,9 +70,9 @@ class MetaPruner:
         n_pruned = min(ceil(pr * n_wg), n_wg - 1) # do not prune all
         if mode == "rand":
             out = np.random.permutation(n_wg)[:n_pruned]
-        elif mode == "min":
+        elif mode == "minimum":
             out = w_abs_list.sort()[1][:n_pruned]
-        elif mode == "max":
+        elif mode == "maximum":
             out = w_abs_list.sort()[1][-n_pruned:]
         return out
 

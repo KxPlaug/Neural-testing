@@ -1,0 +1,13 @@
+[Config]
+model="vgg16_cifar100"
+dataset="cifar100"
+name="vgg16_pruning_finished_asl"
+mask="Outputs/pruning_vgg16_cifar100/Pruning_1/asl/0.35/mask.pkl"
+
+[Explanation_1]
+
+    [Explanation_1.saliencymap]
+    input="test_dataloader"
+    save="True"
+    evaluate="True"
+    all_load="True"

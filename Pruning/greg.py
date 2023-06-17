@@ -118,7 +118,7 @@ class GReg:
                  reg_granularity_recover=1e-4,reg_granularity_prune=1e-4,reg_granularity_pick=1e-5,
                  reg_upper_limit_pick=1e-2,reg_upper_limit=1.0,lr_prune=0.001,
                  test_interval=2000,update_reg_interval=5,stabilize_reg_interval=40000,n_conv_within_block=3,res=True,
-                 stage_pr="[0,0.675,0.675,0.675,0.675,0.675]",skip_layers="",pick_pruned="min"):
+                 stage_pr="[0,0.675,0.675,0.675,0.675,0.675]",skip_layers="",pick_pruned="minimum"):
         self.img_size = img_size
         self.num_classes = num_classes
         self.num_channels = num_chennels
@@ -135,8 +135,8 @@ class GReg:
         self.stabilize_reg_interval = stabilize_reg_interval
         self.n_conv_within_block = n_conv_within_block
         self.res = res
-        self.stage_pr = stage_pr
-        self.skip_layers = skip_layers
+        self.stage_pr = str(stage_pr)
+        self.skip_layers = str(skip_layers)
         self.pick_pruned = pick_pruned
 
     def __call__(self, model, train_loader_prune, test_loader,save_path):

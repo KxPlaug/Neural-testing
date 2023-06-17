@@ -63,9 +63,9 @@ class SINIFGSM(Attack):
                 nes_images = nes_image / torch.pow(2, i)
                 # Calculate loss
                 if self.targeted:
-                    cost = -self.get_loss(adv_images, target_labels)
+                    cost = -self.get_loss(nes_images, target_labels)
                 else:
-                    cost = self.get_loss(adv_images, labels)
+                    cost = self.get_loss(nes_images, labels)
                 adv_grad += torch.autograd.grad(cost, adv_images,
                                                 retain_graph=False, create_graph=False)[0]
             adv_grad = adv_grad / self.m

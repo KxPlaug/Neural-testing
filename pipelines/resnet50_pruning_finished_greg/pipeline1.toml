@@ -1,0 +1,10 @@
+[Config]
+model="resnet50_cifar100"
+dataset="cifar100"
+name="resnet50_pruning_finished_greg"
+mask="Outputs/pruning_resnent50_cifar100/Pruning_1/greg/0.35/mask.pkl"
+
+[Indicator]
+    [Indicator.builtin]
+    input="test_dataloader"
+    model="model"

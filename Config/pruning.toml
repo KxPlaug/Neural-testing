@@ -1,15 +1,15 @@
 [asl]
-lv=10.0
+lv=2.0
 epochs=1000
 lr=0.1
 sparsity='adaptive'
 pthres=1000
-pruning_ratio=0.65
+pruning_ratio=0.35
 
 
 [greg]
-img_size=224
-num_classes=1000
+img_size=32
+num_classes=100
 num_chennels=3
 momentum=0.9
 weight_decay=1e-4
@@ -19,19 +19,19 @@ reg_granularity_pick=1e-5
 reg_upper_limit_pick=1e-2
 reg_upper_limit=1.0
 lr_prune=0.001
-test_interval=2000
+test_interval=500
 update_reg_interval=5
 stabilize_reg_interval=40000
 n_conv_within_block=3
 res="True"
-stage_pr="[0,0.675,0.675,0.675,0.675,0.675]"
+stage_pr="[0,0.35,0.35,0.35,0.35,0.35]"
 skip_layers=""
-pick_pruned="min"
+pick_pruned="minimum"
 
 [obd]
 alpha=0.000001
-pruning_ratio=0.65
+pruning_ratio=0.35
 
 [taylor]
 alpha=0.000001
-pruning_ratio=0.65
+pruning_ratio=0.35

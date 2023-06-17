@@ -1,0 +1,14 @@
+[Config]
+model="vgg16_cifar100"
+dataset="cifar100"
+name="20230614-185325"
+
+[Mutants_7]
+    [Mutants_7.randomcrop]
+    input="test_dataloader"
+    output="randomcrop_test_dataloader"
+
+[Indicator_7]
+    [Indicator_7.builtin]
+    input="randomcrop_test_dataloader"
+    model="model"

@@ -46,7 +46,7 @@ def guided_ig(model, data, target, steps=15):
 
 def agi(model, data, target, epsilon=0.05, max_iter=20, topk=20, num_classes=1000):
     assert len(data.shape) == 4, "Input data must be 4D tensor"
-    random.seed(3407)
+    random.seed(2023)
     selected_ids = random.sample(list(range(0, num_classes-1)), topk)
     output = model(data)
 

@@ -136,8 +136,8 @@ class ComposedModel():
             # if not, add a Softmax layer
             self.output_layer = nn.Softmax(dim=-1)
             self.output_model.add_module('output_layer', self.output_layer)
-        self.is_single_branch = False #  refer to the definition of single_branch_model
-        self.num_layers = count_num_layers(self.model) # refer to the definition of num_layers
+        self.output_model.is_single_branch = False #  refer to the definition of single_branch_model
+        self.output_model.num_layers = count_num_layers(self.model) # refer to the definition of num_layers
         self.output_model.eval()
         self.output_model.to(device)
         self.output_model.get_loss = self.get_loss

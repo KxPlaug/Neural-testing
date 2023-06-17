@@ -6,17 +6,43 @@ import pandas as pd
 from utils import check_device
 from tqdm import tqdm
 import numpy as np
+from Config.Dataset.coco_eval import CocoEvaluator
+from Config.Dataset.coco_utils import get_coco_api_from_dataset
+import torchvision
+device = check_device()
+from io import StringIO 
+import sys
+
+class Capturing(list):
+    def __enter__(self):
+        self._stdout = sys.stdout
+        sys.stdout = self._stringio = StringIO()
+        return self
+    def __exit__(self, *args):
+        self.extend(self._stringio.getvalue().splitlines())
+        del self._stringio
+        sys.stdout = self._stdout
 
 
-def compute_classification_metrics(model, dataloader, experiment_name, num_classes=1000):
+def _get_iou_types(model):
+    model_without_ddp = model
+    if isinstance(model, torch.nn.parallel.DistributedDataParallel):
+        model_without_ddp = model.module
+    iou_types = ["bbox"]
+    if isinstance(model_without_ddp, torchvision.models.detection.MaskRCNN):
+        iou_types.append("segm")
+    if isinstance(model_without_ddp, torchvision.models.detection.KeypointRCNN):
+        iou_types.append("keypoints")
+    return iou_types
+
+
+def metric(model, dataloader, num_classes=1000):
     """_description_
 
     Args:
         model (_type_): pytorch model
         dataloader (_type_): your dataloader
-        experiment_name (_type_): name of your experiment
     """
-    device = check_device()
 
     losses = []
     true_labels = []
@@ -66,11 +92,31 @@ def compute_classification_metrics(model, dataloader, experiment_name, num_class
     metrics = {"Metric": ["Accuracy", "Loss", "TPR", "TNR", "PPV", "NPV", "FPR", "FNR", "FDR", "ROC_AUC"],
                "Value": [accuracy, average_loss, TPR, TNR, PPV, NPV, FPR, FNR, FDR, ROC_AUC]}
     metrics = pd.DataFrame(metrics)
-    os.makedirs(f'outputs/Indicator/{experiment_name}', exist_ok=True)
     metrics = metrics.round(4)
-    metrics.to_csv(
-        f'outputs/Indicator/{experiment_name}/metrics.csv', index=False)
+    
     class_report = pd.DataFrame(class_report).transpose()
     class_report = class_report.round(4)
-    class_report.to_csv(
-        f'outputs/Indicator/{experiment_name}/class_report.csv')
+
+    return metrics, class_report
+
+
+def ob_metric(model,dataloader):
+    model.eval()
+    iou_types = _get_iou_types(model)
+    coco = get_coco_api_from_dataset(dataloader.dataset)
+    coco_evaluator = CocoEvaluator(coco, iou_types)
+    for idx, (images, targets) in tqdm(enumerate(dataloader), total=len(dataloader)):
+        images = list(image.to(device) for image in images)
+        targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
+        outputs = model(images, targets)
+        outputs = [{k: v.to("cpu") for k, v in t.items()}
+                   for t in outputs]
+        res = {target["image_id"].item(): output for target,
+               output in zip(targets, outputs)}
+        coco_evaluator.update(res)
+    coco_evaluator.synchronize_between_processes()
+    coco_evaluator.accumulate()
+    coco_evaluator.summarize()
+    with Capturing() as output:
+        coco_evaluator.summarize()
+    return output

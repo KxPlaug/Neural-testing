@@ -7,6 +7,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
+from utils import check_device
+device = check_device()
 
 
 class SparseSTE(torch.autograd.Function):
@@ -45,7 +47,7 @@ class SparseConv(nn.Module):
             a = rr
         else:
             a = rr.detach()
-
+        a = a.to(device)
         l = a * (w-m).std().detach()
         nw = (w - m) / (l + 1e-6)
         sw = SparseSTE.apply(nw)
@@ -78,7 +80,7 @@ class SparseFc(nn.Module):
             a = rr
         else:
             a = rr.detach()
-
+        a = a.to(device)
         l = a * (w - m).std().detach()
         nw = (w - m) / (l + 1e-6)
         sw = SparseSTE.apply(nw)
@@ -89,6 +91,7 @@ class SparseFc(nn.Module):
 
 
 def iter_sparsify(m, r, trainable=True, pthres=1000):
+    # linear_count = True
     for name, child in m.named_children():
         iter_sparsify(child, r, trainable, pthres)
         if type(child) == nn.Conv2d:
@@ -96,9 +99,13 @@ def iter_sparsify(m, r, trainable=True, pthres=1000):
                 slayer = SparseConv(child, r, trainable)
                 m.__setattr__(name, slayer)
         if type(child) == nn.Linear:
-            if (child.in_features * child.out_features) >= pthres:
+            if (child.in_features * child.out_features) >= 4096*4096:
+                # if linear_count:
                 slayer = SparseFc(child, r, trainable)
                 m.__setattr__(name, slayer)
+                # else:
+                #     pass
+                # linear_count = not linear_count
 
 
 def iter_desparsify(m):
@@ -111,7 +118,7 @@ def iter_desparsify(m):
 
             mean = 0.0  # w.mean()
             s = (w-mean).std()
-            r = (s * torch.clamp(child.r, 0, 5)).item()
+            r = (s * torch.clamp(child.r, 0, 5).to(device)).item()
             w = F.hardshrink(w-mean, r + 1e-6)
             conv.weight.data = w
 
@@ -123,7 +130,7 @@ def iter_desparsify(m):
 
             mean = 0.0  # w.mean()
             s = (w - mean).std()
-            r = (s * torch.clamp(child.r, 0, 5)).item()
+            r = (s * torch.clamp(child.r, 0, 5).to(device)).item()
             w = F.hardshrink(w - mean, r + 1e-6)
             fc.weight.data = w
 
@@ -143,7 +150,7 @@ def sparsity(model, print_per_layer=False):
                 print(" Not Recognized Sparse Module ")
 
             m = 0.0  # w.mean()
-            a = torch.clamp(layer.r, 0, 5)
+            a = torch.clamp(layer.r, 0, 5).to(device)
             l = a * (w-m).std()
             nw = F.hardshrink((w - m) / (l+1e-6), 1)
             tsparsity = (nw == 0).float().sum().item()

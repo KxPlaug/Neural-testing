@@ -1,5 +1,5 @@
 import torch
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 import numpy as np
 import torch.nn as nn
 from utils import check_device

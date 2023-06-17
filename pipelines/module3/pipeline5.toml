@@ -1,0 +1,54 @@
+[Config]
+model="resnet50_cifar100"
+dataset="cifar100"
+
+[Adversarial_1]
+    [Adversarial_1.fgsm]
+    input="test_dataloader"
+    save="True"
+    other_models="densenet121_cifar100, vgg16_cifar100, googlenet_cifar100, mobilenetv2_cifar100, inceptionv3_cifar100"
+
+    [Adversarial_1.bim]
+    input="test_dataloader"
+    save="True"
+    other_models="densenet121_cifar100, vgg16_cifar100, googlenet_cifar100, mobilenetv2_cifar100, inceptionv3_cifar100"
+
+    [Adversarial_1.difgsm]
+    input="test_dataloader"
+    save="True"
+    other_models="densenet121_cifar100, vgg16_cifar100, googlenet_cifar100, mobilenetv2_cifar100, inceptionv3_cifar100"
+
+    [Adversarial_1.tifgsm]
+    input="test_dataloader"
+    save="True"
+    other_models="densenet121_cifar100, vgg16_cifar100, googlenet_cifar100, mobilenetv2_cifar100, inceptionv3_cifar100"
+
+    [Adversarial_1.mifgsm]
+    input="test_dataloader"
+    save="True"
+    other_models="densenet121_cifar100, vgg16_cifar100, googlenet_cifar100, mobilenetv2_cifar100, inceptionv3_cifar100"
+
+    [Adversarial_1.sinifgsm]
+    input="test_dataloader"
+    save="True"
+    other_models="densenet121_cifar100, vgg16_cifar100, googlenet_cifar100, mobilenetv2_cifar100, inceptionv3_cifar100"
+
+    [Adversarial_1.pgd]
+    input="test_dataloader"
+    save="True"
+    other_models="densenet121_cifar100, vgg16_cifar100, googlenet_cifar100, mobilenetv2_cifar100, inceptionv3_cifar100"
+
+    [Adversarial_1.ssa]
+    input="test_dataloader"
+    save="True"
+    other_models="densenet121_cifar100, vgg16_cifar100, googlenet_cifar100, mobilenetv2_cifar100, inceptionv3_cifar100"
+
+    [Adversarial_1.advgan]
+    input="test_dataloader"
+    save="True"
+    other_models="densenet121_cifar100, vgg16_cifar100, googlenet_cifar100, mobilenetv2_cifar100, inceptionv3_cifar100"
+
+    [Adversarial_1.cw]
+    input="test_dataloader"
+    save="True"
+    other_models="densenet121_cifar100, vgg16_cifar100, googlenet_cifar100, mobilenetv2_cifar100, inceptionv3_cifar100"

@@ -1,0 +1,12 @@
+[Config]
+model="resnet50_cifar100"
+dataset="cifar100"
+name="resnet50_cifar100_explanation"
+
+[Explanation_1]
+
+    [Explanation_1.big]
+    input="test_dataloader"
+    save="True"
+    evaluate="True"
+    all_load="True"

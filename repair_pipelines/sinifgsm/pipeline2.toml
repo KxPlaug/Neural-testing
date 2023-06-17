@@ -1,0 +1,11 @@
+[Config]
+model="vgg16_cifar100"
+dataset="cifar100"
+name="20230614-230831"
+
+[Adversarial_1]
+
+    [Adversarial_1.sinifgsm]
+    input="test_dataloader"
+    save="True"
+    other_models="densenet121_cifar100, resnet50_cifar100, googlenet_cifar100, mobilenetv2_cifar100, inceptionv3_cifar100"

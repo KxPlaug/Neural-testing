@@ -2,7 +2,7 @@ from torch import nn
 from torchvision.transforms import Normalize
 import torch.nn.functional as F
 import torch
-from torchvision.models import resnet50, ResNet50_Weights
+from torchvision.models import resnet50,inception_v3
 from utils import count_num_layers,check_device
 device = check_device()
 
@@ -20,10 +20,7 @@ TYPE = 'Image Classification'  # MODIFY THIS LINE, options: 'Image Classificatio
 
 class ComposedModel():
     def get_model(self):
-        self.model = resnet50(num_classes=NUM_CLASSES)  # modify this line to use your own model
-        weights = ResNet50_Weights.verify(ResNet50_Weights.DEFAULT)
-        self.model.load_state_dict(weights.get_state_dict(
-            progress=True))  # modify this line to load your own model weights
+        self.model = resnet50(num_classes=NUM_CLASSES,pretrained=True)  # modify this line to use your own model
         self.output_model = nn.Sequential()
         self._configure_normalization(MEAN, STD)
         # if dataset is normalized, then no need to normalize again
@@ -37,8 +34,8 @@ class ComposedModel():
             # if not, add a Softmax layer
             self.output_layer = nn.Softmax(dim=-1)
             self.output_model.add_module('output_layer', self.output_layer)
-        self.is_single_branch = False #  refer to the definition of single_branch_model
-        self.num_layers = count_num_layers(self.model) # refer to the definition of num_layers
+        self.output_model.is_single_branch = False #  refer to the definition of single_branch_model
+        self.output_model.num_layers = count_num_layers(self.model) # refer to the definition of num_layers
         self.output_model.eval()
         self.output_model.to(device)
         self.output_model.get_loss = self.get_loss

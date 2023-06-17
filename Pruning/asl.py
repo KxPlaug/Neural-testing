@@ -159,7 +159,7 @@ class ASL:
                 if name in self.all_param_names:
                     self.all_param_masks[name] = (param != 0).float()
             pruned_ratio = calculate_pruned(model_clone, self.all_param_masks)
-            if (self.starget - pruned_ratio) < 0.01 and (self.starget - pruned_ratio) > 0:
+            if ((self.starget - pruned_ratio) < 0.01 and (self.starget - pruned_ratio) > 0) or pruned_ratio > self.starget:
                 print("pruning ratio reached")
                 mask = copy.deepcopy(self.all_param_masks)
                 for key in mask.keys():

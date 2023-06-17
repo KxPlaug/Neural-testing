@@ -1,0 +1,68 @@
+[Config]
+model="retinanet_coco"
+dataset="coco"
+
+[Indicator_0]
+    [Indicator_0.builtin]
+    input="test_dataloader"
+    model="model"
+
+[Mutants_1]
+    [Mutants_1.datamissingod]
+    input="test_dataloader"
+    output="datamissing_test_dataloader"
+
+[Indicator_1]
+    [Indicator_1.builtin]
+    input="datamissing_test_dataloader"
+    model="model"
+
+[Mutants_2]
+    [Mutants_2.datashuffleod]
+    input="test_dataloader"
+    output="datashuffle_test_dataloader"
+
+[Indicator_2]
+    [Indicator_2.builtin]
+    input="datashuffle_test_dataloader"
+    model="model"
+
+[Mutants_3]
+    [Mutants_3.noiseperturbod]
+    input="test_dataloader"
+    output="noiseperturb_test_dataloader"
+
+[Indicator_3]
+    [Indicator_3.builtin]
+    input="noiseperturb_test_dataloader"
+    model="model"
+
+[Mutants_4]
+    [Mutants_4.contrastratiood]
+    input="test_dataloader"
+    output="contrastratio_test_dataloader"
+
+[Indicator_4]
+    [Indicator_4.builtin]
+    input="contrastratio_test_dataloader"
+    model="model"
+
+[Mutants_5]
+    [Mutants_5.brightnessod]
+    input="test_dataloader"
+    output="brightness_test_dataloader"
+
+[Indicator_5]
+    [Indicator_5.builtin]
+    input="brightness_test_dataloader"
+    model="model"
+
+[Mutants_6]
+    [Mutants_6.randomcropod]
+    input="test_dataloader"
+    output="randomcrop_test_dataloader"
+
+[Indicator_6]
+    [Indicator_6.builtin]
+    input="randomcrop_test_dataloader"
+    model="model"

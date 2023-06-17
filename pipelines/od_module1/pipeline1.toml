@@ -1,0 +1,8 @@
+[Config]
+model="fasterrcnn_coco"
+dataset="coco"
+
+[Indicator]
+    [Indicator.builtin]
+    input="test_dataloader"
+    model="model"
