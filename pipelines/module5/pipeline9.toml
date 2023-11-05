@@ -1,9 +1,0 @@
-[Config]
-model="resnet50_cifar100"
-dataset="cifar100"
-name="pruning_045"
-
-[Pruning_1]
-    [Pruning_1.taylor]
-    input="train_dataloader"
-    output="taylor_pruned_model_0_45"
