@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from utils import check_device
 import torch.nn as nn
 from adversarial.imageclassification import AdvGAN
-
+device = check_device()
 
 def wrapper_method(func):
     def wrapper_func(self, *args, **kwargs):
@@ -583,8 +583,14 @@ def run_attack(model, method, dataloader, transfer_models=None, **kwargs):
         print("Transferability:")
         with torch.no_grad():
             for model_name, transfer_model in transfer_models.items():
+                BATCH_SIZE = dataloader.batch_size
+                transfer_preds = list()
+                for i in range(0, len(adv_data), BATCH_SIZE):
+                    transfer_preds.append(
+                        transfer_model(adv_data[i:i+BATCH_SIZE].to(device)).cpu())
+                transfer_preds = torch.cat(transfer_preds)
                 print(
-                    f"{model_name}: {(transfer_model(adv_data).argmax(dim=-1)!=true_labels).float().mean()}")
+                    f"{model_name}: {(transfer_preds.argmax(dim=-1)!=true_labels).float().mean()}")
     return adv_data, original_data
 
 

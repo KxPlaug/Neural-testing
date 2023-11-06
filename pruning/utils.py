@@ -1051,3 +1051,31 @@ class LossLine():
             out.append(item)
         return sep.join(out)
         
+import matplotlib.pyplot as plt
+import numpy as np
+from indicator.builtin import metric
+def analyze_pruning(model,pruned_model,test_dataloader,num_classes=10):
+    r"""
+    Analyze the effect of pruning on the model.
+    Arguments:
+        model: The original model.
+        pruned_model: The pruned model.
+        test_dataloader: The dataloader of test dataset.
+        num_classes: The number of classes.
+    """
+    metrics, _ = metric(model,test_dataloader,num_classes=10)
+    metrics_pruned, _ = metric(pruned_model,test_dataloader,num_classes=10)
+    # covert two metrics to list and plot bar chart
+    x_labels = metrics.iloc[:,0].values
+    metrics = metrics.iloc[:,1].values
+    metrics_pruned =  metrics_pruned.iloc[:,1].values
+    width = 0.3
+    plt.figure(figsize=(8,6))
+    plt.bar(np.arange(len(metrics))-width/2,metrics,width=width,label='Original')
+    plt.bar(np.arange(len(metrics))+width/2,metrics_pruned,width=width,label='Pruned')
+    plt.xticks(range(len(metrics)),x_labels)
+    plt.xlabel('Metrics')
+    plt.ylabel('Value')
+    plt.legend()
+    plt.show()
+    
