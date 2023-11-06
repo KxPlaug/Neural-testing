@@ -168,3 +168,4 @@ outputs/
 *.png
 *.csv
 *.json
+state_dicts.zip
