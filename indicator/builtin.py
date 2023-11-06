@@ -29,24 +29,18 @@ def metric(model, dataloader, num_classes=1000):
     losses = []
     true_labels = []
     predicted_labels = []
-    all_times = []
     with torch.no_grad():
         for images, labels in dataloader:
             images = images.to(device)
             labels = labels.to(device)
 
-            start_time = time.time()
             outputs, loss = model.get_loss(images, labels)
-            end_time = time.time()
-            all_times.append(end_time-start_time)
             losses.append(loss.item())
 
             true_labels.append(labels.cpu().numpy())
             predicted_labels.append(outputs.cpu().numpy())
-    time_sum = sum(all_times)
     average_loss = np.mean(losses)
     true_labels = np.concatenate(true_labels)
-    FPS = len(true_labels)/time_sum
     predicted_labels = np.concatenate(predicted_labels)
     accuracy = np.mean(true_labels == predicted_labels.argmax(-1))
     cnf_confusion_matrix = confusion_matrix(
@@ -78,8 +72,8 @@ def metric(model, dataloader, num_classes=1000):
     class_report = classification_report(
         true_labels, predicted_labels.argmax(-1), output_dict=True,digits=4,labels=list(range(num_classes)))
 
-    metrics = {"Metric": ["Accuracy", "Loss", "TPR", "TNR", "PPV", "NPV", "FPR", "FNR", "FDR", "ROC_AUC","FPS"],
-               "Value": [accuracy, average_loss, TPR, TNR, PPV, NPV, FPR, FNR, FDR, ROC_AUC,FPS]}
+    metrics = {"Metric": ["Accuracy", "Loss", "TPR", "TNR", "PPV", "NPV", "FPR", "FNR", "FDR", "ROC_AUC"],
+               "Value": [accuracy, average_loss, TPR, TNR, PPV, NPV, FPR, FNR, FDR, ROC_AUC]}
     metrics = pd.DataFrame(metrics)
     metrics = metrics.round(4)
     
