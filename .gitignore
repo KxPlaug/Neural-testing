@@ -166,6 +166,5 @@ outputs/
 *.sh
 *.pdf
 *.png
-*.ipynb
 *.csv
 *.json
