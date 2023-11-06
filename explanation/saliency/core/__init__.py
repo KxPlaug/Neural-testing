@@ -7,4 +7,4 @@ from .sm import SaliencyGradient
 from .sg import SmoothGradient
 from .deeplift import DL
 from .saliencymap import SaliencyMap
-from .fast_ig import FastIGOD,FastIGTC
+# from .fast_ig import FastIGOD,FastIGTC

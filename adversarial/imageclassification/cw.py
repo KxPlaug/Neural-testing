@@ -1,4 +1,4 @@
-from adversarial.imageclassification import Attack
+from adversarial.imageclassification.attack import Attack
 import torch
 import torch.nn as nn
 import torch.optim as optim

@@ -169,5 +169,3 @@ outputs/
 *.ipynb
 *.csv
 *.json
-Config/Dataset/coco/*
-Config/Dataset/imagenet_1k/*

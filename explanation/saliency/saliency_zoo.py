@@ -1,4 +1,4 @@
-from .core import FastIG, GuidedIG, pgd_step, BIG, FGSM, SaliencyGradient, SmoothGradient, DL, IntegratedGradient, SaliencyMap,FastIGOD,FastIGTC
+from .core import FastIG, GuidedIG, pgd_step, BIG, FGSM, SaliencyGradient, SmoothGradient, DL, IntegratedGradient, SaliencyMap
 import torch
 import numpy as np
 import random
