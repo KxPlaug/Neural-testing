@@ -1,5 +1,9 @@
 # Neural-testing
 
+First, you need to download the ckpt file from [here](https://github.com/huyvnphan/PyTorch_CIFAR10.git) and put it in the `./ckpt` folder.
+
+Then, you can run example.ipynb to see the results.
+
 # Reference
 Code refer to: 
 [adversarial-attacks-pytorch
