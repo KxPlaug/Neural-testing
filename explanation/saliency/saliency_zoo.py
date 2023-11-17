@@ -101,7 +101,7 @@ def agi(model, data, target, epsilon=0.05, max_iter=20, topk=20, num_classes=100
 
         targeted = torch.tensor([l] * data.shape[0]).to(device)
 
-        if l < 999:
+        if l < num_classes-1:
             targeted[targeted == init_pred] = l + 1
         else:
             targeted[targeted == init_pred] = l - 1
